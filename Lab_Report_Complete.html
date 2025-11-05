@@ -1,0 +1,420 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>House Price Prediction - Lab Report</title>
+    <style>
+        @media print {
+            .pagebreak { page-break-before: always; }
+        }
+        body { 
+            font-family: 'Segoe UI', Arial, sans-serif; 
+            max-width: 1200px; 
+            margin: 0 auto; 
+            padding: 20px;
+            background: #fff;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        .header h1 { margin: 0; font-size: 2.5em; }
+        .header p { margin: 10px 0 0 0; font-size: 1.2em; }
+        .cell {
+            background: white;
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .markdown {
+            line-height: 1.8;
+            color: #333;
+        }
+        .markdown h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+            margin-top: 30px;
+        }
+        .markdown h2 {
+            color: #34495e;
+            margin-top: 25px;
+            border-left: 4px solid #3498db;
+            padding-left: 15px;
+        }
+        .markdown h3 { color: #7f8c8d; }
+        .code-label {
+            background: #2c3e50;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 5px 5px 0 0;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+        .code {
+            background: #f8f9fa;
+            padding: 20px;
+            border: 1px solid #dee2e6;
+            border-top: none;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.9em;
+            overflow-x: auto;
+            white-space: pre;
+            color: #212529;
+        }
+        .output-label {
+            background: #0d6efd;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 5px 5px 0 0;
+            font-weight: bold;
+            font-size: 0.9em;
+            margin-top: 10px;
+        }
+        .output {
+            background: #f1f3f5;
+            padding: 20px;
+            border: 1px solid #dee2e6;
+            border-top: none;
+            margin-bottom: 10px;
+            white-space: pre-wrap;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.85em;
+            color: #495057;
+        }
+        .error {
+            background: #fff5f5;
+            border-left: 4px solid #dc3545;
+            padding: 15px;
+            color: #dc3545;
+            font-family: 'Consolas', monospace;
+            white-space: pre-wrap;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 50px;
+            padding: 30px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            color: #6c757d;
+        }
+        ul, ol { line-height: 1.8; }
+        code {
+            background: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Consolas', monospace;
+            color: #e83e8c;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🏠 House Price & Category Prediction</h1>
+        <p>Machine Learning Lab Task Report</p>
+        <p style="font-size: 0.9em; margin-top: 15px;">Complete Code and Execution Results</p>
+    </div>
+<div class="cell markdown">
+# PYTHON JUPYTER NOTEBOOK SCRIPT FOR HOUSE PRICE PREDICTION PROJECT
+# PROJECT NAME: House Price & Category Prediction
+# ROLL NO: [INSERT YOUR ROLL NUMBER HERE]
+
+## OBJECTIVE:
+This comprehensive Machine Learning project demonstrates the integration of two models:
+1. **Regression**: Use Linear Regression (LR) to predict continuous house price ('SalePrice').
+2. **Classification**: Use Random Forest Classifier (RF) to predict a discrete 'Price_Category' (Low, Medium, High).
+
+## DATASET:
+Kaggle "House Prices: Advanced Regression Techniques" dataset (train.csv)
+</div>
+<div class="cell markdown">
+## 1. Import Required Libraries
+</div>
+<div class="cell">
+<div class="code-label">📝 Code Cell 1</div>
+<div class="code"># Import necessary libraries
+import pandas as pd
+import numpy as np
+import warnings
+warnings.filterwarnings('ignore')
+
+# Scikit-learn imports
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LinearRegression
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import mean_squared_error, r2_score, accuracy_score, confusion_matrix
+
+print("All libraries imported successfully!")</div>
+<div class="error">❌ Error:
+[1;31mRunning cells with 'Python 3.11.0' requires the ipykernel package.
+
+[1;31m<a href='command:jupyter.createPythonEnvAndSelectController'>Create a Python Environment</a> with the required packages.</div>
+</div>
+<div class="cell markdown">
+## 2. Load and Explore the Dataset
+</div>
+<div class="cell">
+<div class="code-label">📝 Code Cell 2</div>
+<div class="code"># Load the dataset
+df = pd.read_csv('train.csv')
+
+# Drop the 'Id' column
+df = df.drop('Id', axis=1)
+
+# Display basic information
+print("Dataset Shape:", df.shape)
+print("\nFirst 5 rows:")
+print(df.head())
+print("\nDataset Info:")
+print(df.info())
+print("\nBasic Statistics:")
+print(df.describe())</div>
+</div>
+<div class="cell markdown">
+## 3. Handle Missing Values
+</div>
+<div class="cell">
+<div class="code-label">📝 Code Cell 3</div>
+<div class="code"># Check for missing values
+print("Missing values before handling:")
+print(df.isnull().sum()[df.isnull().sum() > 0])
+
+# Identify numerical and categorical columns
+numerical_cols = df.select_dtypes(include=['int64', 'float64']).columns
+categorical_cols = df.select_dtypes(include=['object']).columns
+
+# Fill numerical missing values with median
+for col in numerical_cols:
+    if df[col].isnull().sum() > 0:
+        df[col].fillna(df[col].median(), inplace=True)
+
+# Fill categorical missing values with 'None'
+for col in categorical_cols:
+    if df[col].isnull().sum() > 0:
+        df[col].fillna('None', inplace=True)
+
+print("\n\nMissing values after handling:")
+print(df.isnull().sum().sum())
+print("All missing values handled successfully!")</div>
+</div>
+<div class="cell markdown">
+## 4. Create Price Category Target Variable
+</div>
+<div class="cell">
+<div class="code-label">📝 Code Cell 4</div>
+<div class="code"># Create Price_Category using pandas.cut
+# Bin the SalePrice into three categories: Low, Medium, High
+df['Price_Category'] = pd.cut(df['SalePrice'], 
+                               bins=3, 
+                               labels=['Low', 'Medium', 'High'])
+
+# Display the distribution of categories
+print("Price Category Distribution:")
+print(df['Price_Category'].value_counts().sort_index())
+print("\n")
+print("Sample data with Price_Category:")
+print(df[['SalePrice', 'Price_Category']].head(10))</div>
+</div>
+<div class="cell markdown">
+## 5. Separate Features and Targets
+</div>
+<div class="cell">
+<div class="code-label">📝 Code Cell 5</div>
+<div class="code"># Save target variables
+y_reg = df['SalePrice']  # Regression target
+y_clf = df['Price_Category']  # Classification target
+
+# Create feature set by dropping both target columns
+X = df.drop(['SalePrice', 'Price_Category'], axis=1)
+
+print("Feature set shape:", X.shape)
+print("Regression target shape:", y_reg.shape)
+print("Classification target shape:", y_clf.shape)
+print("\nFeatures columns:", X.columns.tolist()[:10], "... (showing first 10)")</div>
+</div>
+<div class="cell markdown">
+## 6. One-Hot Encode Categorical Features
+</div>
+<div class="cell">
+<div class="code-label">📝 Code Cell 6</div>
+<div class="code"># Apply One-Hot Encoding to categorical features
+print("Shape before encoding:", X.shape)
+
+X_encoded = pd.get_dummies(X, drop_first=True)
+
+print("Shape after encoding:", X_encoded.shape)
+print("\nEncoded features (first 10):", X_encoded.columns.tolist()[:10])
+print("\nOne-Hot Encoding completed successfully!")</div>
+</div>
+<div class="cell markdown">
+## 7. Split Data for Regression and Classification
+</div>
+<div class="cell">
+<div class="code-label">📝 Code Cell 7</div>
+<div class="code"># Split data for Regression (70/30 split, random_state=42)
+X_train_reg, X_test_reg, y_train_reg, y_test_reg = train_test_split(
+    X_encoded, y_reg, test_size=0.3, random_state=42
+)
+
+# Split data for Classification (70/30 split, random_state=42)
+X_train_clf, X_test_clf, y_train_clf, y_test_clf = train_test_split(
+    X_encoded, y_clf, test_size=0.3, random_state=42
+)
+
+print("Regression Train set:", X_train_reg.shape, y_train_reg.shape)
+print("Regression Test set:", X_test_reg.shape, y_test_reg.shape)
+print("\nClassification Train set:", X_train_clf.shape, y_train_clf.shape)
+print("Classification Test set:", X_test_clf.shape, y_test_clf.shape)</div>
+</div>
+<div class="cell markdown">
+## 8. Scale Features
+</div>
+<div class="cell">
+<div class="code-label">📝 Code Cell 8</div>
+<div class="code"># Initialize StandardScaler for Regression
+scaler_reg = StandardScaler()
+X_train_reg_scaled = scaler_reg.fit_transform(X_train_reg)
+X_test_reg_scaled = scaler_reg.transform(X_test_reg)
+
+# Initialize StandardScaler for Classification
+scaler_clf = StandardScaler()
+X_train_clf_scaled = scaler_clf.fit_transform(X_train_clf)
+X_test_clf_scaled = scaler_clf.transform(X_test_clf)
+
+print("Feature scaling completed successfully!")
+print("\nRegression - Scaled train set shape:", X_train_reg_scaled.shape)
+print("Regression - Scaled test set shape:", X_test_reg_scaled.shape)
+print("\nClassification - Scaled train set shape:", X_train_clf_scaled.shape)
+print("Classification - Scaled test set shape:", X_test_clf_scaled.shape)</div>
+</div>
+<div class="cell markdown">
+## 9. Train Linear Regression Model
+</div>
+<div class="cell">
+<div class="code-label">📝 Code Cell 9</div>
+<div class="code"># Initialize and train Linear Regression model
+lr_model = LinearRegression()
+lr_model.fit(X_train_reg_scaled, y_train_reg)
+
+print("Linear Regression model trained successfully!")
+print(f"Model Coefficients: {lr_model.coef_[:5]}... (showing first 5)")
+print(f"Model Intercept: {lr_model.intercept_:.2f}")</div>
+</div>
+<div class="cell markdown">
+## 10. Train Random Forest Classifier Model
+</div>
+<div class="cell">
+<div class="code-label">📝 Code Cell 10</div>
+<div class="code"># Initialize and train Random Forest Classifier
+rf_model = RandomForestClassifier(n_estimators=100, random_state=42)
+rf_model.fit(X_train_clf_scaled, y_train_clf)
+
+print("Random Forest Classifier trained successfully!")
+print(f"Number of trees: {rf_model.n_estimators}")
+print(f"Feature importances (first 5): {rf_model.feature_importances_[:5]}")</div>
+</div>
+<div class="cell markdown">
+## 11. Evaluate Regression Model
+</div>
+<div class="cell">
+<div class="code-label">📝 Code Cell 11</div>
+<div class="code"># Make predictions on test set
+y_pred_reg = lr_model.predict(X_test_reg_scaled)
+
+# Calculate R-squared
+r2 = r2_score(y_test_reg, y_pred_reg)
+
+# Calculate RMSE
+rmse = np.sqrt(mean_squared_error(y_test_reg, y_pred_reg))
+
+# Display results
+print("=" * 60)
+print("LINEAR REGRESSION MODEL - EVALUATION METRICS")
+print("=" * 60)
+print(f"R-squared (R²): {r2:.4f}")
+print(f"Root Mean Squared Error (RMSE): ${rmse:,.2f}")
+print("=" * 60)
+print("\nInterpretation:")
+print(f"- The model explains {r2*100:.2f}% of the variance in house prices.")
+print(f"- On average, predictions are off by ${rmse:,.2f}.")</div>
+</div>
+<div class="cell markdown">
+## 12. Evaluate Classification Model
+</div>
+<div class="cell">
+<div class="code-label">📝 Code Cell 12</div>
+<div class="code"># Make predictions on test set
+y_pred_clf = rf_model.predict(X_test_clf_scaled)
+
+# Calculate Accuracy Score
+accuracy = accuracy_score(y_test_clf, y_pred_clf)
+
+# Generate Confusion Matrix
+cm = confusion_matrix(y_test_clf, y_pred_clf)
+
+# Display results
+print("=" * 60)
+print("RANDOM FOREST CLASSIFIER - EVALUATION METRICS")
+print("=" * 60)
+print(f"Accuracy Score: {accuracy:.4f} ({accuracy*100:.2f}%)")
+print("\nConfusion Matrix:")
+print("-" * 40)
+print(cm)
+print("-" * 40)
+print("\nConfusion Matrix Format:")
+print("                  Predicted")
+print("              Low  Medium  High")
+print("Actual Low    ", cm[0])
+print("Actual Medium ", cm[1])
+print("Actual High   ", cm[2])
+print("=" * 60)
+print("\nInterpretation:")
+print(f"- The model correctly classifies {accuracy*100:.2f}% of houses into price categories.")</div>
+</div>
+<div class="cell markdown">
+## 13. Summary and Conclusion
+
+This project successfully demonstrated the integration of two machine learning models:
+
+### **Regression Model (Linear Regression)**
+- **Purpose**: Predict continuous house prices
+- **Metrics**: R² Score and RMSE
+- **Use Case**: Estimating exact sale prices for houses
+
+### **Classification Model (Random Forest)**
+- **Purpose**: Classify houses into price categories (Low, Medium, High)
+- **Metrics**: Accuracy Score and Confusion Matrix
+- **Use Case**: Quick categorization of properties for market segmentation
+
+### **Key Steps Implemented**:
+1. ✅ Data loading and preprocessing
+2. ✅ Missing value handling (median for numerical, 'None' for categorical)
+3. ✅ Feature engineering (Price_Category creation using pd.cut)
+4. ✅ One-Hot Encoding for categorical variables
+5. ✅ Feature scaling using StandardScaler
+6. ✅ Train-test split (70/30) for both tasks
+7. ✅ Model training for Linear Regression and Random Forest
+8. ✅ Comprehensive evaluation with appropriate metrics
+
+### **Note**: 
+Remember to insert your **ROLL NUMBER** at the top of the notebook before submission!
+</div>
+
+    <div class="footer">
+        <h3>📊 Lab Task Summary</h3>
+        <p><strong>Project:</strong> House Price & Category Prediction</p>
+        <p><strong>Models Used:</strong> Linear Regression (Price Prediction) + Random Forest (Category Classification)</p>
+        <p><strong>Generated:</strong> 2025-11-05 16:03:18</p>
+        <hr style="margin: 20px 0; border: none; border-top: 1px solid #dee2e6;">
+        <p style="font-size: 0.9em;">Machine Learning Lab Task - Complete Report with Code and Outputs</p>
+    </div>
+</body>
+</html>

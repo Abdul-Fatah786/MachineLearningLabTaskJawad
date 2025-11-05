@@ -135,8 +135,8 @@ This project is open source and available for educational purposes.
 ## 👤 Author
 
 **Muhammad Jawad**
-- Roll Number: [Your Roll Number]
-- GitHub: [@yourusername](https://github.com/yourusername)
+- Roll Number: 22F-BSAI-97
+- GitHub: [@jawad234107](https://github.comjawad234107)
 
 ## 🙏 Acknowledgments
 
